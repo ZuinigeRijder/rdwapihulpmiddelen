@@ -13,11 +13,11 @@ goto endofperl
 #!C:\Perl\Bin\perl.exe -w
 #line 15
 #
-# (c) Copyright 2000: Philips Electronics N.V. All rights reserved
+# 
 #
-# Rick Everaerts,
-# Philips Medical Systems
-# MIT Best
+# Zuinige Rijder
+# 
+#
 #
 #2345678901234567890123456789012345678901234567890123456789012345678901234567890
 #===============================================================================
