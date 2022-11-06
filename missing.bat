@@ -1235,7 +1235,7 @@ foreach my $k (@KENTEKENS) {
 }
 close(OUTFILE);
 
-print "\n\nNieuw gevonden kentekens van nog niet gekende kentekens nog niet op naam:\n[code]\n";
+print "\n\nNieuw gevonden gescande kentekens:\n[code]\n";
 my @sorted = sort { (substr($a, 23) cmp substr($b, 23)) or (substr($a, 7) cmp substr($b, 7)) or (substr($a, 0, 1) cmp substr($b, 0, 1)) or (substr($a, 4, 2) cmp substr($b, 4, 2)) or (substr($a, 1) cmp substr($b, 1))} @newMissing;
 print @sorted;
 print "[/code]\n\n";

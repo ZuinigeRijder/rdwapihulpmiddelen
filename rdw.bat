@@ -1619,13 +1619,13 @@ if (not $OVERVIEW and not $SUMMARY) {
 }
 
 if (@gekendOpNaam > 0) {
-    print "Gekend op naam:\n[code]\n";
+    print "Eerder gevonden kenteken op naam gezet:\n[code]\n";
     my @sortedGekendOpNaam = sort { (substr($a, 23) cmp substr($b, 23)) or (substr($a, 7) cmp substr($b, 7)) or (substr($a, 0, 1) cmp substr($b, 0, 1)) or (substr($a, 4, 2) cmp substr($b, 4, 2)) or (substr($a, 1) cmp substr($b, 1))} @gekendOpNaam;
     print @sortedGekendOpNaam;
     print "[/code]\n\n";
 }
 if (@nieuwOpNaam > 0) {
-    print "Nieuw op naam:\n[code]\n";
+    print "Nieuw kenteken op naam gezet:\n[code]\n";
     my @sortedNieuwOpNaam = sort { (substr($a, 23) cmp substr($b, 23)) or (substr($a, 7) cmp substr($b, 7)) or (substr($a, 0, 1) cmp substr($b, 0, 1)) or (substr($a, 4, 2) cmp substr($b, 4, 2)) or (substr($a, 1) cmp substr($b, 1))} @nieuwOpNaam;
     print @sortedNieuwOpNaam;
     print "[/code]\n\n";
@@ -1666,6 +1666,7 @@ if ($OVERVIEW or $SUMMARY) {
     $HREF{"juli 2022"} = 'https://gathering.tweakers.net/forum/list_message/72300528#72300528';
     $HREF{"augustus 2022"} = 'https://gathering.tweakers.net/forum/list_message/72624024#72624024';
     $HREF{"september 2022"} = 'https://gathering.tweakers.net/forum/list_message/72989402#72989402';
+    $HREF{"oktober 2022"} = 'https://gathering.tweakers.net/forum/list_message/73324494#73324494';
 
     foreach my $key (sort keys %DATES) {
         my $count = $DATES{$key};
