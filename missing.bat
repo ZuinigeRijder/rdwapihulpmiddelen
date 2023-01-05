@@ -293,10 +293,10 @@ sub findVariantExact($$$$$) {
     my $result = '';
     
     foreach my $pricelist_date (@PRICELISTS_DATES) {
-        #if ($date < $pricelist_date) {
-        #    print("Skipping pricelist $pricelist_date for $date\n") if $DEBUG;
-        #    next; # skip registration dates before prijslist date
-        #}
+        if ($date < $pricelist_date) {
+             print("Skipping pricelist $pricelist_date for $date\n") if $DEBUG;
+             next; # skip registration dates before prijslist date
+        }
     
         print("Checking $kenteken pricelist $pricelist_date for $date\n") if $DEBUG;
         #if ("$kenteken" eq "P185VD") {
@@ -485,7 +485,7 @@ sub getVariant($$$$) {
         print "#opNaam  : $opNaam\n";
         print "#date    : $date\n";
     }
-    if ($date < 20210401 or $date > 20230101) {
+    if ($date < 20210401 or $date > 20240101) {
         myDie("Unexpected date: $date for $kenteken $fulltype\n");
     }
 
@@ -503,6 +503,7 @@ sub getVariant($$$$) {
     if (not $prijskleur =~ /^prijs: /) {
        myDie("Geen prijs in fulltype: $fulltype");
     }
+        
     if ($variant eq 'F5E14') {
         $value = '73 kWh AWD';
     } elsif ($variant eq 'F5E32') {
@@ -537,7 +538,7 @@ sub getVariant($$$$) {
         myDie("ERROR: kleur $kleur fout voor $kenteken: $fulltype");
     }
     
-    if (($prijs < 42500 or $prijs > 69000) and $prijs != 72300 and $prijs != 37831) {
+    if (($prijs < 42500 or $prijs > 69000) and $prijs != 72300 and $prijs != 37831 and $prijs != 5242655  and $prijs != 78650) {
         myDie("ERROR: prijs $prijs fout voor $kenteken: $fulltype");
     }
     print "#prijs   : $prijs\n" if $DEBUG;
@@ -787,8 +788,8 @@ sub getVariant($$$$) {
 }
 
 
-# pricelists of sept 2022, mei 2022, maart 2022, mei 2021
-@PRICELISTS_DATES = ("20220901", "20220501", "20220301", "20210501");
+# pricelists of jan 2023, sept 2022, mei 2022, maart 2022, mei 2021
+@PRICELISTS_DATES = ("20230101", "20220901", "20220501", "20220301", "20210501");
 
 #========== model2022 ============================================================
 # model 2022 prijslijst mei 2021 (prijslijst mei 2022 1500 euro duurder)
@@ -998,6 +999,52 @@ fillPrice(\%pricessept2022_big_battery_AWD_2023, 'Lounge', 62900, 77, $true, $tr
 $PRICELISTS{"20220901_58_2023"} = \%pricessept2022_small_battery_2023;
 $PRICELISTS{"20220901_77"} = \%pricessept2022_big_battery_2023;
 $PRICELISTS{"20220901_77AWD"} = \%pricessept2022_big_battery_AWD_2023;
+
+# model 2023 prijslijst januari 2023: 1400 euro duurder dan september 2022
+my %pricesjan2023_small_battery_2023;
+my %pricesjan2023_big_battery_2023;
+my %pricesjan2023_big_battery_AWD_2023;
+
+fillPrice(\%pricesjan2023_small_battery_2023, 'Style', 47200, 58, $false, $true, "jan 2023");
+fillPrice(\%pricesjan2023_small_battery_2023, 'Connect', 51300, 58, $false, $true, "jan 2023");
+fillPrice(\%pricesjan2023_small_battery_2023, 'Connect+', 54300, 58, $false, $true, "jan 2023");
+fillPrice(\%pricesjan2023_small_battery_2023, 'Lounge', 56700, 58, $false, $true, "jan 2023");
+
+fillPrice(\%pricesjan2023_big_battery_2023, 'Style', 50800, 77, $false, $true, "jan 2023");
+fillPrice(\%pricesjan2023_big_battery_2023, 'Connect', 54900, 77, $false, $true, "jan 2023");
+fillPrice(\%pricesjan2023_big_battery_2023, 'Connect+', 57900, 77, $false, $true, "jan 2023");
+fillPrice(\%pricesjan2023_big_battery_2023, 'Lounge', 60300, 77, $false, $true, "jan 2023");
+        
+fillPrice(\%pricesjan2023_big_battery_AWD_2023, 'Connect', 58900, 77, $true, $true, "jan 2023");
+fillPrice(\%pricesjan2023_big_battery_AWD_2023, 'Connect+', 61900, 77, $true, $true, "jan 2023");
+fillPrice(\%pricesjan2023_big_battery_AWD_2023, 'Lounge', 64300, 77, $true, $true, "jan 2023");
+
+$PRICELISTS{"20230101_58_2023"} = \%pricesjan2023_small_battery_2023;
+$PRICELISTS{"20230101_77"} = \%pricesjan2023_big_battery_2023;
+$PRICELISTS{"20230101_77AWD"} = \%pricesjan2023_big_battery_AWD_2023;
+
+# model 2023 prijslijst januari 2023: 1400 euro duurder dan september 2022
+my %pricesjan2023_small_battery_2023;
+my %pricesjan2023_big_battery_2023;
+my %pricesjan2023_big_battery_AWD_2023;
+
+fillPrice(\%pricesjan2023_small_battery_2023, 'Style', 47200, 58, $false, $true, "jan 2023");
+fillPrice(\%pricesjan2023_small_battery_2023, 'Connect', 51300, 58, $false, $true, "jan 2023");
+fillPrice(\%pricesjan2023_small_battery_2023, 'Connect+', 54300, 58, $false, $true, "jan 2023");
+fillPrice(\%pricesjan2023_small_battery_2023, 'Lounge', 56700, 58, $false, $true, "jan 2023");
+
+fillPrice(\%pricesjan2023_big_battery_2023, 'Style', 50800, 77, $false, $true, "jan 2023");
+fillPrice(\%pricesjan2023_big_battery_2023, 'Connect', 54900, 77, $false, $true, "jan 2023");
+fillPrice(\%pricesjan2023_big_battery_2023, 'Connect+', 57900, 77, $false, $true, "jan 2023");
+fillPrice(\%pricesjan2023_big_battery_2023, 'Lounge', 60300, 77, $false, $true, "jan 2023");
+        
+fillPrice(\%pricesjan2023_big_battery_AWD_2023, 'Connect', 58900, 77, $true, $true, "jan 2023");
+fillPrice(\%pricesjan2023_big_battery_AWD_2023, 'Connect+', 61900, 77, $true, $true, "jan 2023");
+fillPrice(\%pricesjan2023_big_battery_AWD_2023, 'Lounge', 64300, 77, $true, $true, "jan 2023");
+
+$PRICELISTS{"20230101_58_2023"} = \%pricesjan2023_small_battery_2023;
+$PRICELISTS{"20230101_77"} = \%pricesjan2023_big_battery_2023;
+$PRICELISTS{"20230101_77AWD"} = \%pricesjan2023_big_battery_AWD_2023;
 
 my $filename="missing.txt";
 print "Processing $filename\n";

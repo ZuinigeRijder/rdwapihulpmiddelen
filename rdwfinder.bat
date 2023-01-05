@@ -28,6 +28,7 @@ goto endofperl
 #===============================================================================
 #use diagnostics;
 use strict;
+use POSIX qw/strftime/;
 use JSON qw( decode_json );     # From CPAN
 use Data::Dumper;
 
@@ -122,6 +123,9 @@ my @results;
 my $current = $from;
 my $count = 0;
 my $start_time = time();
+my $BEGIN_TIME = time();
+print strftime('%Y-%m-%d %H:%M:%S',localtime);
+print "\n";
 while ($current <= $to and $current <= 1000 and $current >= 0) {
     my $currentNumber = sprintf("%03s", $current);
     my $kenteken = "$BEGINLETTER$currentNumber" . "$LETTERS";
@@ -185,5 +189,9 @@ foreach (sort @results) {
     print "$_\n";
 }
 print "Totaal aantal IONIQ5: $count\n";
+print strftime('%Y-%m-%d %H:%M:%S',localtime);
+my $END_TIME = time();
+my $ELAPSED_TIME = $END_TIME - $BEGIN_TIME;
+print "  Elapsed: [$ELAPSED_TIME]\n";
 __END__
 :endofperl

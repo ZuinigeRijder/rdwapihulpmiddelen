@@ -30,6 +30,7 @@ goto endofperl
 use strict;
 use JSON qw( decode_json );     # From CPAN
 use Data::Dumper;
+use File::Copy;
 
 $| = 1; # no output buffering
 
@@ -469,7 +470,7 @@ sub getVariant($$$$) {
         print "#opNaam  : $opNaam\n";
         print "#date    : $date\n";
     }
-    if ($date < 20210401 or $date > 20230101) {
+    if ($date < 20210401 or $date > 20240101) {
         myDie("Unexpected date: $date for $kenteken $fulltype\n");
     }
 
@@ -521,7 +522,7 @@ sub getVariant($$$$) {
         myDie("ERROR: kleur $kleur fout voor $kenteken: $fulltype");
     }
     
-    if (($prijs < 42500 or $prijs > 69000) and $prijs != 72300 and $prijs != 37831) {
+    if (($prijs < 42500 or $prijs > 71000) and $prijs != 72300 and $prijs != 37831 and $prijs != 5242655 and $prijs != 78650) {
         myDie("ERROR: prijs $prijs fout voor $kenteken: $fulltype");
     }
     print "#prijs   : $prijs\n" if $DEBUG;
@@ -840,8 +841,8 @@ if (@ARGV == 1) {
     die("Invalid number of arguments: Usage: rdw [SUMMARY|OVERVIEW]\n");
 }
 
-# pricelists of sept 2022, mei 2022, maart 2022, mei 2021
-@PRICELISTS_DATES = ("20220901", "20220501", "20220301", "20210501");
+# pricelists of jan 2023, sept 2022, mei 2022, maart 2022, mei 2021
+@PRICELISTS_DATES = ("20230101", "20220901", "20220501", "20220301", "20210501");
 
 #========== model2022 ============================================================
 # model 2022 prijslijst mei 2021 (prijslijst mei 2022 1500 euro duurder)
@@ -1052,6 +1053,29 @@ $PRICELISTS{"20220901_58_2023"} = \%pricessept2022_small_battery_2023;
 $PRICELISTS{"20220901_77"} = \%pricessept2022_big_battery_2023;
 $PRICELISTS{"20220901_77AWD"} = \%pricessept2022_big_battery_AWD_2023;
 
+# model 2023 prijslijst januari 2023: 1400 euro duurder dan september 2022
+my %pricesjan2023_small_battery_2023;
+my %pricesjan2023_big_battery_2023;
+my %pricesjan2023_big_battery_AWD_2023;
+
+fillPrice(\%pricesjan2023_small_battery_2023, 'Style', 47200, 58, $false, $true, "jan 2023");
+fillPrice(\%pricesjan2023_small_battery_2023, 'Connect', 51300, 58, $false, $true, "jan 2023");
+fillPrice(\%pricesjan2023_small_battery_2023, 'Connect+', 54300, 58, $false, $true, "jan 2023");
+fillPrice(\%pricesjan2023_small_battery_2023, 'Lounge', 56700, 58, $false, $true, "jan 2023");
+
+fillPrice(\%pricesjan2023_big_battery_2023, 'Style', 50800, 77, $false, $true, "jan 2023");
+fillPrice(\%pricesjan2023_big_battery_2023, 'Connect', 54900, 77, $false, $true, "jan 2023");
+fillPrice(\%pricesjan2023_big_battery_2023, 'Connect+', 57900, 77, $false, $true, "jan 2023");
+fillPrice(\%pricesjan2023_big_battery_2023, 'Lounge', 60300, 77, $false, $true, "jan 2023");
+        
+fillPrice(\%pricesjan2023_big_battery_AWD_2023, 'Connect', 58900, 77, $true, $true, "jan 2023");
+fillPrice(\%pricesjan2023_big_battery_AWD_2023, 'Connect+', 61900, 77, $true, $true, "jan 2023");
+fillPrice(\%pricesjan2023_big_battery_AWD_2023, 'Lounge', 64300, 77, $true, $true, "jan 2023");
+
+$PRICELISTS{"20230101_58_2023"} = \%pricesjan2023_small_battery_2023;
+$PRICELISTS{"20230101_77"} = \%pricesjan2023_big_battery_2023;
+$PRICELISTS{"20230101_77AWD"} = \%pricesjan2023_big_battery_AWD_2023;
+
 my $filename="x.kentekens";
 my $cmd;
 if (not $SUMMARY and not $OVERVIEW) {
@@ -1200,6 +1224,7 @@ foreach my $k (@sortedKentekens) {
     
     my $kenteken = ${$hash}{'kenteken'};
     if (length($kenteken) != 6) {
+        move($filename, "$filename.fout");
         die("Kenteken lengte fout: [$filename],[$kenteken]\n");
     }
     my $date = ${$hash}{'datum_eerste_afgifte_nederland'};
@@ -1245,7 +1270,7 @@ foreach my $k (@sortedKentekens) {
     if ($prijs eq '' and $kenteken ne 'R296FL') {
         die("Prijs leeg: [$filename],[$prijs]\n");
     }
-    if (length($prijs) != 5 and $kenteken ne 'N770TS' and $kenteken ne 'R296FL') {
+    if (length($prijs) != 5 and $kenteken ne 'N770TS' and $kenteken ne 'R296FL' and $kenteken ne 'R303XF') {
         die("Prijs verkeerd: [$filename],[$prijs]\n");
     }
     
@@ -1273,6 +1298,11 @@ foreach my $k (@sortedKentekens) {
         $uitvoering = 'E11B11';
         $typegoedkeuring = 'e9*2018/858*11054*01';
         $prijs = 55600;
+     } elsif ($kenteken eq 'R303XF') { # geen Lounge maar Techniq uitvoering
+        $variant = 'F5E42';
+        $uitvoering = 'E11A11';
+        $typegoedkeuring = 'e9*2018/858*11054*01';
+        $prijs = 52426;
     }
     
     if ($variant eq '') {
@@ -1642,8 +1672,8 @@ my $pMODEL2022 = $MODEL2022 / $count * 100;
 my $pMODEL2022_5 = $MODEL2022_5 / $count * 100;
 my $pMODEL2023 = $MODEL2023 / $count * 100;
 printf("%4.1f %% model 2022   ($MODEL2022 maal)\n", $pMODEL2022);
-printf("%4.1f %% model 2022.5 ($MODEL2022_5 maal)\n", $pMODEL2022_5);
 printf("%4.1f %% model 2023   ($MODEL2023 maal)\n", $pMODEL2023);
+printf("%4.1f %% model 2022.5 ($MODEL2022_5 maal)\n", $pMODEL2022_5);
 print "\n";
 
 if ($OVERVIEW or $SUMMARY) {
@@ -1667,11 +1697,19 @@ if ($OVERVIEW or $SUMMARY) {
     $HREF{"augustus 2022"} = 'https://gathering.tweakers.net/forum/list_message/72624024#72624024';
     $HREF{"september 2022"} = 'https://gathering.tweakers.net/forum/list_message/72989402#72989402';
     $HREF{"oktober 2022"} = 'https://gathering.tweakers.net/forum/list_message/73324494#73324494';
+    $HREF{"november 2022"} = 'https://gathering.tweakers.net/forum/list_message/73660348#73660348';
+    $HREF{"december 2022"} = 'https://gathering.tweakers.net/forum/list_message/73984554#73984554';
 
+    my %YEARS;
     foreach my $key (sort keys %DATES) {
         my $count = $DATES{$key};
         my $countstring = sprintf("%3d", $count);
         my $jaar = substr($key, 0, 4);
+        if (exists $YEARS{$jaar}) {
+            $YEARS{$jaar} = $count + $YEARS{$jaar};
+        } else {
+            $YEARS{$jaar} = $count
+        }
         my $maand = substr($key, 4, 2);
         my $maandjaarstring = $MONTHS{$maand} . " $jaar";
         if (exists $HREF{$maandjaarstring}) {
@@ -1679,6 +1717,11 @@ if ($OVERVIEW or $SUMMARY) {
         } else {
             print "$countstring op naam gezet in $maandjaarstring\n";
         }
+    }
+    print "\n";
+    foreach my $key (sort keys %YEARS) {
+        my $count = $YEARS{$key};
+        print "$count op naam gezet in $key\n";
     }
     print "\n";
 
@@ -1698,8 +1741,8 @@ if ($OVERVIEW or $SUMMARY) {
     my $pSTYLE = $STYLE / $count * 100;
 
     printf("%4.1f %% warmtepomp (standaard vanaf Connect+, $WP maal)\n", $pWP);
-    printf("%4.1f %% vehicle to load (standaard vanaf Connect, $V2L maal)\n", $pV2L);
     printf("%4.1f %% grote batterij ($LONGRANGEBATTERY maal)\n", $pLONGRANGEBATTERY);
+    printf("%4.1f %% vehicle to load (standaard vanaf Connect, $V2L maal)\n", $pV2L);
     printf("%4.1f %% achterwielaandrijving ($RWD maal)\n", $pRWD);
     printf("%4.1f %% panoramadak ($PANORAMADAK maal)\n", $pPANORAMADAK);
     printf("%4.1f %% zonnepanelendak (alleen op PROJECT45, $SOLARDAK maal)\n", $pSOLARDAK);
@@ -1763,8 +1806,8 @@ if ($OVERVIEW or $SUMMARY) {
     printf("%4.1f %% Mica Parelmoer kleur ($COLORMICAPEARL maal)\n", $pCOLORMICAPEARL);
     printf("%4.1f %% Mat kleur ($COLORMATTE maal)\n", $pCOLORMATTE);
     printf("%4.1f %% Metallic kleur ($COLORMETALLIC maal)\n", $pCOLORMETALLIC);
-    printf("%4.1f %% Solid kleur ($COLORSOLID maal)\n", $pCOLORSOLID);
     printf("%4.1f %% Mica Kleur ($COLORMICA maal)\n", $pCOLORMICA);
+    printf("%4.1f %% Solid kleur ($COLORSOLID maal)\n", $pCOLORSOLID);
 
     print "[/code]\n\n";
 
