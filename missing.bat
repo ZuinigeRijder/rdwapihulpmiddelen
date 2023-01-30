@@ -514,6 +514,8 @@ sub getVariant($$$$) {
         $value = '77 kWh';
     } elsif ($variant eq 'F5E62') {
         $value = '77 kWh';
+    } elsif ($variant eq 'F5E24') { # error??
+        $value = '58 kWh';
     } else {
         myDie("ERROR: variant $variant fout voor $kenteken: $fulltype");
     }
@@ -538,7 +540,7 @@ sub getVariant($$$$) {
         myDie("ERROR: kleur $kleur fout voor $kenteken: $fulltype");
     }
     
-    if (($prijs < 42500 or $prijs > 69000) and $prijs != 72300 and $prijs != 37831 and $prijs != 5242655  and $prijs != 78650) {
+    if (($prijs < 42000 or $prijs > 69000) and $prijs != 72300 and $prijs != 37831 and $prijs != 5242655  and $prijs != 78650 and $prijs != 33589) {
         myDie("ERROR: prijs $prijs fout voor $kenteken: $fulltype");
     }
     print "#prijs   : $prijs\n" if $DEBUG;

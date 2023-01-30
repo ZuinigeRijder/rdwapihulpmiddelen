@@ -498,6 +498,8 @@ sub getVariant($$$$) {
         $value = '77 kWh';
     } elsif ($variant eq 'F5E62') {
         $value = '77 kWh';
+    } elsif ($variant eq 'F5E24') {
+        $value = '58 kWh';
     } else {
         myDie("ERROR: variant $variant fout voor $kenteken: $fulltype");
     }
@@ -522,7 +524,7 @@ sub getVariant($$$$) {
         myDie("ERROR: kleur $kleur fout voor $kenteken: $fulltype");
     }
     
-    if (($prijs < 42500 or $prijs > 71000) and $prijs != 72300 and $prijs != 37831 and $prijs != 5242655 and $prijs != 78650) {
+    if (($prijs < 42000 or $prijs > 71000) and $prijs != 72300 and $prijs != 37831 and $prijs != 5242655 and $prijs != 78650 and $prijs != 33589) {
         myDie("ERROR: prijs $prijs fout voor $kenteken: $fulltype");
     }
     print "#prijs   : $prijs\n" if $DEBUG;
@@ -583,6 +585,10 @@ sub getVariant($$$$) {
             $prijs2 = 0;
         } else {
             myDie("PROGRAMERROR: kleur $kleur fout voor $kenteken: $fulltype");
+        }
+        
+        if ($DEBUG and $kenteken eq 'R059VH') {
+             print "$kenteken, $prijs, $variant, $model2023, $date\n";
         }
 
         my $foundVariant = findVariantExact($kenteken, $prijs, $variant, $model2023, $date);
@@ -1308,7 +1314,7 @@ foreach my $k (@sortedKentekens) {
     if ($variant eq '') {
         die("Variant leeg: [$filename],[$variant]\n");
     }
-    if ($variant ne 'F5E14' and $variant ne 'F5E32' and $variant ne 'F5P41' and $variant ne 'F5E42' and $variant ne 'F5E54' and $variant ne 'F5E62') {
+    if ($variant ne 'F5E14' and $variant ne 'F5E32' and $variant ne 'F5P41' and $variant ne 'F5E42' and $variant ne 'F5E54' and $variant ne 'F5E62' and $variant ne 'F5E24') {
         die("Variant verkeerd $kenteken: [$filename],[$variant]\n");
     }
     
@@ -1329,10 +1335,19 @@ foreach my $k (@sortedKentekens) {
     my $type = "$variant;$uitvoering;$typegoedkeuring; prijs: $prijs $kleur";
     my $date20 = $dateToelating;
     $date20 =~ s/\?\?/20/; # nog niet op naam date can start with ??
+    if ($dateBPM ne '' and $dateBPM < $dateToelating) {
+        $date20 = $dateBPM;
+        print "Overruled $kenteken met dateBPM: dateToelating: $dateToelating with dateBPM $dateBPM\n" if $DEBUG;
+    }
+    $date20 =~ s/\?\?/20/; # nog niet op naam date can start with ??
     if (substr($date20, 0, 3) != "202") {
         print "Invalid toelating date: $date20\n";
         $date20 = substr($date20, 6, 4) . substr($date20, 3,2) . substr($date20, 0,2);
         print "Corrected toalating date: $date20";
+    }
+    
+    if ($DEBUG and $kenteken eq 'R059VH') {
+        print "$kenteken, date: $date, datetoelating: $dateToelating, date20: $date20, dateBPM: $dateBPM\n";
     }
     my $value = getVariant($type, $true, $k, $date20); 
     
@@ -1417,7 +1432,11 @@ foreach my $item (split /\n/, $registered) {
         my $type = substr($m, 36) . ' ' . substr($m, 16, 10);
         print "Type: [$type]\n" if $DEBUG;
         if (not($type =~ /^F5E14/) and not($type =~ /^F5E32/) and not($type =~ /^F5P41/) and not ($type =~ /^F5E42/) and not ($type =~ /^F5E54/) and not ($type =~ /^F5E62/)) {
-            print "Type wrong: [$m][$type]\n";
+            if ($type =~ /^F5E24/) {
+                print "Info: unknown type: [$m][$type]\n";
+            } else {
+                print "Type wrong: [$m][$type]\n";
+            }
         }
         my $date20 = substr($m, 7, 8);
         $date20 =~ s/\?\?/20/; # nog niet op naam date can start with ??
