@@ -1718,6 +1718,7 @@ if ($OVERVIEW or $SUMMARY) {
     $HREF{"oktober 2022"} = 'https://gathering.tweakers.net/forum/list_message/73324494#73324494';
     $HREF{"november 2022"} = 'https://gathering.tweakers.net/forum/list_message/73660348#73660348';
     $HREF{"december 2022"} = 'https://gathering.tweakers.net/forum/list_message/73984554#73984554';
+    $HREF{"januari 2023"} = 'https://gathering.tweakers.net/forum/list_message/74335278#74335278';
 
     my %YEARS;
     foreach my $key (sort keys %DATES) {
