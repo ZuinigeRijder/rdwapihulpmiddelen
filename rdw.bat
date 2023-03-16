@@ -15,8 +15,8 @@ goto endofperl
 #
 #
 #
-# Zuinige Rijder,
-#
+# Zuinige Rijder
+# 
 #
 #
 #2345678901234567890123456789012345678901234567890123456789012345678901234567890
@@ -28,6 +28,7 @@ goto endofperl
 #===============================================================================
 #use diagnostics;
 use strict;
+use Carp;
 use JSON qw( decode_json );     # From CPAN
 use Data::Dumper;
 use File::Copy;
@@ -76,6 +77,7 @@ my $COLORMICA = 0;
 my $COLORSOLID = 0;
 my $COLORMICAPEARL = 0;
 
+
 #===============================================================================
 # die
 # parameter 1: die string
@@ -84,6 +86,7 @@ sub myDie($) {
     my ($txt) = @_;
     print "\n", "?" x 80, "\n";
     print "Error: $txt\n\n";
+    croak("$txt\n\n");
     exit 1;
 }
 
@@ -346,7 +349,7 @@ sub findHelper($$) {
         }
     }
     my $result = $$prices{$foundPrice};
-    if ($foundDelta != 0) {
+    if ($foundDelta != 0 and $foundDelta != 9999999) {
         my $delta = $prijs - $foundPrice;
         my $absDelta = abs($delta);
         if ($absDelta == $delta) {
@@ -382,7 +385,7 @@ sub findVariantNearest($$$$$) {
             next; # skip registration dates before prijslist date
         }
         
-        print("Checking $kenteken pricelist $pricelist_date for $date\n") if $DEBUG;
+        print("Checking nearest pricelist $kenteken pricelist $pricelist_date for $date\n") if $DEBUG;
         if ($smallbattery) {
             if ($model2023) {
                 $result = findHelper($PRICELISTS{$pricelist_date . "_58_2023"}, $prijs);  
@@ -587,10 +590,6 @@ sub getVariant($$$$) {
             myDie("PROGRAMERROR: kleur $kleur fout voor $kenteken: $fulltype");
         }
         
-        if ($DEBUG and $kenteken eq 'R059VH') {
-             print "$kenteken, $prijs, $variant, $model2023, $date\n";
-        }
-
         my $foundVariant = findVariantExact($kenteken, $prijs, $variant, $model2023, $date);
         my $foundVariant2 = '';
         if ($prijs != $prijs2 and $prijs2 != 0) {
@@ -645,7 +644,11 @@ sub getVariant($$$$) {
                 $foundVariant2 .= ' (Atlas White Matte)';
                 if ($foundVariant ne '') {
                     print "Found DUBBEL WHITE $kenteken: $fulltype -> [$foundVariant],[$foundVariant2]\n";
-                    $foundVariant2 = ''; #do not assume Atlas White Matte
+                    if ($model2023) {
+                        $foundVariant = ''; #do assume Atlas White Matte
+                    } else {
+                        $foundVariant2 = ''; #do not assume Atlas White Matte
+                    }
                 }
             }
         } elsif ($kleur eq 'GROEN') {
@@ -745,6 +748,7 @@ sub getVariant($$$$) {
     }
     
     my $stripped = $value;
+    print("clean variant before: [$stripped]\n") if $DEBUG;
     $stripped =~ s?\$\(E[0-9]+ [a-z]+ dan prijslijst\)??; # exclude dollar and goedkoper/duurder
     $stripped =~ s?\$??; # exclude dollar in counting
     $stripped =~ s? \(model 202[^)]+\)??i; # exclude model in counting
@@ -761,6 +765,7 @@ sub getVariant($$$$) {
     $stripped =~ s? \(Shooting Star\)??; # exclude colorinfo in counting
     $stripped =~ s? \(Atlas White Matte\)??; # exclude colorinfo in counting
     $stripped =~s?\s+$??; # remove trailing spaces
+    print("clean variant after: [$stripped]\n") if $DEBUG;
     if (exists $VARIANTSCOUNT{$stripped}) {
         $VARIANTSCOUNT{$stripped} += 1;
     } else {
@@ -841,10 +846,10 @@ if (@ARGV == 1) {
     } elsif ($ARGV[0] =~ /UPDATE/i) {
        $UPDATE = $true;
     } else {
-       die("Usage: rdw [SUMMARY|OVERVIEW|UPDATE]\n");
+       myDie("Usage: rdw [SUMMARY|OVERVIEW|UPDATE]\n");
     }
 } elsif (@ARGV != 0) {
-    die("Invalid number of arguments: Usage: rdw [SUMMARY|OVERVIEW]\n");
+    myDie("Invalid number of arguments: Usage: rdw [SUMMARY|OVERVIEW]\n");
 }
 
 # pricelists of jan 2023, sept 2022, mei 2022, maart 2022, mei 2021
@@ -1098,7 +1103,7 @@ if (not $SUMMARY and not $OVERVIEW) {
 my @KENTEKENS;
 my %KENTEKENS;
 my %TENAAMGESTELD;
-open(FILE, "$filename") or die("Cannot open for read: $filename: $!\n");
+open(FILE, "$filename") or myDie("Cannot open for read: $filename: $!\n");
 while (<FILE>) {
     my $currentLine = $_;
     chomp $currentLine; # get rid of newline
@@ -1106,6 +1111,7 @@ while (<FILE>) {
     $currentLine =~ s?"\}??;
     $currentLine =~ s?\]??;
     push (@KENTEKENS, $currentLine);
+    print("Adding kentekens dict: [$currentLine]\n") if $DEBUG;
     $KENTEKENS{$currentLine} = 1;
 }
 close(FILE);
@@ -1116,12 +1122,12 @@ my $opkenteken = @KENTEKENS;
 my %KENTEKENSEXPORTED;
 if (not $UPDATE) {
     my $fileexport = "exported.txt";
-    open(FILEEXPORT, "$fileexport") or die("Cannot open for read: $fileexport: $!\n");
+    open(FILEEXPORT, "$fileexport") or myDie("Cannot open for read: $fileexport: $!\n");
     while (<FILEEXPORT>) {
         my $currentLine = $_;
         chomp $currentLine; # get rid of newline
         if (not exists $KENTEKENS{$currentLine}) {
-            print "Adding $currentLine\n" if $DEBUG;
+            print "Adding exported: [$currentLine]\n" if $DEBUG;
             push (@KENTEKENS, $currentLine);
             $KENTEKENS{$currentLine} = 1;
         }
@@ -1138,19 +1144,20 @@ my $registered = '';
 
 my %MISSINGTXT;
 my $rewriteMISSINGTXT = $false;
-open(MISSINGTXTFILE, "missing.txt") or die("Cannot open for read: missing.txt: $!\n");
+open(MISSINGTXTFILE, "missing.txt") or myDie("Cannot open for read: missing.txt: $!\n");
 foreach (<MISSINGTXTFILE>) {
     my $m = $_;
     chomp $m;
     my $k = substr($m, 0, 6);
     chomp $k;
     next if $k eq '';
+    print("Adding missing: [$k]\n") if $DEBUG;
     $MISSINGTXT{$k} = $m;
 }
 close(MISSINGTXTFILE);
 
 my %MISSING;
-open(MISSINGFILE, "missing.outfile.txt") or die("Cannot open for read: missing.outfile.txt: $!\n");
+open(MISSINGFILE, "missing.outfile.txt") or myDie("Cannot open for read: missing.outfile.txt: $!\n");
 foreach (<MISSINGFILE>) {
     my $m = $_;
     chomp $m;
@@ -1161,9 +1168,8 @@ foreach (<MISSINGFILE>) {
     uc $c;
     chomp $c;
     my $add = substr($k, 0, 1) . substr($k, 4, 2) . "$k          " . $c;
-    print "Adding: $add\n" if $DEBUG;
+    print "Adding registered: [$add]\n" if $DEBUG;
     $registered =  "$registered$add\n";
-    print "registered: $registered\n" if $DEBUG;
 }
 close(MISSINGFILE);
 
@@ -1203,7 +1209,7 @@ foreach my $k (@sortedKentekens) {
     }
     
     print "Processing: $filename\n" if $DEBUG;
-    open(KENTEKENFILE, "$filename") or die("Cannot open for read: $filename: $!\n");
+    open(KENTEKENFILE, "$filename") or myDie("Cannot open for read: $filename: $!\n");
     my $json_text = <KENTEKENFILE>;
     chomp $json_text; # get rid of newline
     close(KENTEKENFILE);
@@ -1231,22 +1237,11 @@ foreach my $k (@sortedKentekens) {
     my $kenteken = ${$hash}{'kenteken'};
     if (length($kenteken) != 6) {
         move($filename, "$filename.fout");
-        die("Kenteken lengte fout: [$filename],[$kenteken]\n");
+        myDie("Kenteken lengte fout: [$filename],[$kenteken]\n");
     }
     my $date = ${$hash}{'datum_eerste_afgifte_nederland'};
     if ($date eq '') {
         $date = ${$hash}{'datum_eerste_tenaamstelling_in_nederland'}; # changed name 31 maart 2022
-    }
-    if (length($date) != 8) {
-        die("Date lengte fout: [$filename],[$date]\n");
-    }
-    my $dateToelating = ${$hash}{'datum_eerste_toelating'};
-    if (length($dateToelating) != 8) {
-        die("Date lengte fout: [$filename],[$dateToelating]\n");
-    }
-    if ($date ne $dateToelating) {
-        print "Import $k: [$dateToelating] [$date]\n" if $DEBUG;
-        $geimporteerd++;
     }
     my $dateBPM = ${$hash}{'registratie_datum_goedkeuring_afschrijvingsmoment_bpm_dt'};
     if ($dateBPM ne '') {
@@ -1257,27 +1252,47 @@ foreach my $k (@sortedKentekens) {
             } else {
                 print "$k dateBPM: [$dateBPM]\n" if $DEBUG;
             }
-            
+
         } else {
             print "WARNING: $k dateBPM: [$dateBPM]\n";# if $DEBUG
         }
     }
 
+    if ($date eq '' and $dateBPM ne '') {
+       $date = $dateBPM;
+       print("date overruled with $dateBPM: [$filename],[$date]\n");
+    }
+    if (length($date) != 8) {
+        myDie("Date lengte fout: [$filename],[$date]\n");
+    }
+    my $dateToelating = ${$hash}{'datum_eerste_toelating'};
+    if ($dateToelating eq '') {
+        $dateToelating = $date;
+        print("datetoelating overruled with $date: [$filename],[$date]\n");
+    }
+    if (length($dateToelating) != 8) {
+        myDie("Datetoelating lengte fout: [$filename],[$dateToelating]\n");
+    }
+    if ($date ne $dateToelating) {
+        print "Import $k: [$dateToelating] [$date]\n" if $DEBUG;
+        $geimporteerd++;
+    }
+    
     my $kleur = ${$hash}{'eerste_kleur'};
     if ($kleur eq '') {
-        die("Kleur leeg: [$filename],[$kleur]\n");
+        myDie("Kleur leeg: [$filename],[$kleur]\n");
     }
     if ($kleur ne 'GROEN' and $kleur ne 'WIT' and $kleur ne 'ZWART' and $kleur ne 'GEEL' and $kleur ne 'GRIJS' and $kleur ne 'BLAUW' and $kleur ne 'BRUIN') { # BRUIN???
-        die("Kleur onbekend: [$filename],[$kleur]\n");
+        myDie("Kleur onbekend: [$filename],[$kleur]\n");
     }
     $kleur = sprintf("%-10s", $kleur);
     
     my $prijs = ${$hash}{'catalogusprijs'};
     if ($prijs eq '' and $kenteken ne 'R296FL') {
-        die("Prijs leeg: [$filename],[$prijs]\n");
+        myDie("Prijs leeg: [$filename],[$prijs]\n");
     }
     if (length($prijs) != 5 and $kenteken ne 'N770TS' and $kenteken ne 'R296FL' and $kenteken ne 'R303XF') {
-        die("Prijs verkeerd: [$filename],[$prijs]\n");
+        myDie("Prijs verkeerd: [$filename],[$prijs]\n");
     }
     
     my $variant = ${$hash}{'variant'};
@@ -1309,27 +1324,32 @@ foreach my $k (@sortedKentekens) {
         $uitvoering = 'E11A11';
         $typegoedkeuring = 'e9*2018/858*11054*01';
         $prijs = 52426;
-    }
+     } elsif ($kenteken eq 'R818ZL') { # geen Lounge maar Techniq uitvoering
+        $variant = 'F5E42';
+        $uitvoering = 'E11A11';
+        $typegoedkeuring = 'e9*2018/858*11054*01';
+     }
+    
     
     if ($variant eq '') {
-        die("Variant leeg: [$filename],[$variant]\n");
+        myDie("Variant leeg: [$filename],[$variant]\n");
     }
     if ($variant ne 'F5E14' and $variant ne 'F5E32' and $variant ne 'F5P41' and $variant ne 'F5E42' and $variant ne 'F5E54' and $variant ne 'F5E62' and $variant ne 'F5E24') {
-        die("Variant verkeerd $kenteken: [$filename],[$variant]\n");
+        myDie("Variant verkeerd $kenteken: [$filename],[$variant]\n");
     }
     
     if ($uitvoering eq '') {
-        die("Uitvoering leeg: [$filename],[$uitvoering]\n");
+        myDie("Uitvoering leeg: [$filename],[$uitvoering]\n");
     }
     if ($uitvoering ne 'E11A11' and $uitvoering ne 'E11B11') {
-        die("Uitvoering onbekend: [$filename],[$uitvoering]\n");
+        myDie("Uitvoering onbekend: [$filename],[$uitvoering]\n");
     }
     
     if ($typegoedkeuring eq '') {
-        die("Typegoedkeuring leeg: [$filename],[$typegoedkeuring]\n");
+        myDie("Typegoedkeuring leeg: [$filename],[$typegoedkeuring]\n");
     }
     if ($typegoedkeuring ne 'e9*2018/858*11054*01' and $typegoedkeuring ne 'e9*2018/858*11054*03' and $typegoedkeuring ne 'e9*2018/858*11054*04') {
-        die("Typegoedkeuring verkeerd: [$filename],[$typegoedkeuring]\n");
+        myDie("Typegoedkeuring verkeerd: [$filename],[$typegoedkeuring]\n");
     }
     
     my $type = "$variant;$uitvoering;$typegoedkeuring; prijs: $prijs $kleur";
@@ -1385,7 +1405,7 @@ foreach my $k (@sortedKentekens) {
 }
 
 if (not $UPDATE) {
-    open(EXPORTEDTXTFILE, ">exported.txt") or die("Cannot open for write: exported.txt: $!\n");
+    open(EXPORTEDTXTFILE, ">exported.txt") or myDie("Cannot open for write: exported.txt: $!\n");
     foreach my $keytxt (sort keys %KENTEKENSEXPORTED) {
         print EXPORTEDTXTFILE "$keytxt\n";
     }
@@ -1393,7 +1413,7 @@ if (not $UPDATE) {
 }
 
 
-open(MISSINGTXTFILE, ">missing.txt") or die("Cannot open for write: missing.txt: $!\n");
+open(MISSINGTXTFILE, ">missing.txt") or myDie("Cannot open for write: missing.txt: $!\n");
 foreach my $keytxt (sort keys %MISSINGTXT) {
     print MISSINGTXTFILE "$keytxt\n";
 }
@@ -1452,7 +1472,7 @@ foreach my $item (split /\n/, $registered) {
         print "tmpSpecial = [$tmpSpecial]\n" if $DEBUG;
         push @specialKentekens, $tmpSpecial;
     } else {
-        print "Adding: $line\n";
+        print "Adding special: [$line]\n";
         push @specialKentekens, $line;
     }
 }
@@ -1719,6 +1739,7 @@ if ($OVERVIEW or $SUMMARY) {
     $HREF{"november 2022"} = 'https://gathering.tweakers.net/forum/list_message/73660348#73660348';
     $HREF{"december 2022"} = 'https://gathering.tweakers.net/forum/list_message/73984554#73984554';
     $HREF{"januari 2023"} = 'https://gathering.tweakers.net/forum/list_message/74335278#74335278';
+    $HREF{"februari 2023"} = 'https://gathering.tweakers.net/forum/list_message/74650990#74650990';
 
     my %YEARS;
     foreach my $key (sort keys %DATES) {
@@ -1831,7 +1852,18 @@ if ($OVERVIEW or $SUMMARY) {
 
     print "[/code]\n\n";
 
-    foreach my $k (reverse sort { $VARIANTSCOUNT{$a} <=> $VARIANTSCOUNT{$b} } keys %VARIANTSCOUNT) {
+    my @variants_count_list;
+    while (my ($k, $v) = each %VARIANTSCOUNT) {
+        my $line = sprintf("%4d %s", $v, $k);
+        print("line=[$line], k=[$k], count_str=[$v]\n") if $DEBUG;
+        push @variants_count_list, $line;
+    }
+    my @sorted = reverse sort @variants_count_list;
+    foreach my $item (@sorted) {
+        my $line = $item;
+        $line =~ s/^\s+//;
+        my ($count_str, $k) = split(/ /, $line, 2);
+        print("line=[$line], k=[$k], count_str=[$count_str]\n") if $DEBUG;
         print "key: [$k]\n" if $DEBUG;
         my $count = $VARIANTSCOUNT{$k};
         print "$count maal op gekend kenteken variant: $k\n";

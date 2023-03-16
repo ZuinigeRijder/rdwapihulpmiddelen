@@ -28,6 +28,7 @@ goto endofperl
 #===============================================================================
 #use diagnostics;
 use strict;
+use Carp;
 use POSIX qw/strftime/;
 use JSON qw( decode_json );     # From CPAN
 use Data::Dumper;
@@ -140,7 +141,7 @@ while ($current <= $to and $current <= 1000 and $current >= 0) {
     print "$count: Checking $kenteken\n";
     executeCommand($cmd);
     
-    open(KENTEKENFILE, "$filename") or die("Cannot open for read: $filename: $!\n");
+    open(KENTEKENFILE, "$filename") or myDie("Cannot open for read: $filename: $!\n");
     my $match = $false;
     my $matchHyundai = $false;
     while (<KENTEKENFILE>) {
@@ -166,7 +167,7 @@ while ($current <= $to and $current <= 1000 and $current >= 0) {
     }
     close(KENTEKENFILE);
     #if ($match) {
-    #    rename "$filename", "$filename.match.html" or die "Cannot rename file: $!";
+    #    rename "$filename", "$filename.match.html" or myDie "Cannot rename file: $!";
     #}
     my $stop_time = time();
     my $diff_time = $stop_time - $start_time;

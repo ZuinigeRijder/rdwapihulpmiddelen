@@ -28,6 +28,7 @@ goto endofperl
 #===============================================================================
 #use diagnostics;
 use strict;
+use Carp;
 use JSON qw( decode_json );     # From CPAN
 use Data::Dumper;
 
@@ -82,7 +83,7 @@ sub myDie($) {
     my ($txt) = @_;
     print "\n", "?" x 80, "\n";
     print "Error: $txt\n\n";
-    die("$txt\n\n");
+    croak("$txt\n\n");
     exit 1;
 }
 
@@ -657,7 +658,11 @@ sub getVariant($$$$) {
                 $foundVariant2 .= ' (Atlas White Matte)';
                 if ($foundVariant ne '') {
                     print "Found DUBBEL WHITE $kenteken: $fulltype -> [$foundVariant],[$foundVariant2]\n";
-                    $foundVariant2 = ''; #do not assume Atlas White Matte
+                    if ($model2023) {
+                        $foundVariant = ''; #do assume Atlas White Matte
+                    } else {
+                        $foundVariant2 = ''; #do not assume Atlas White Matte
+                    }
                 }
             }
         } elsif ($kleur eq 'GROEN') {
@@ -842,14 +847,14 @@ fillPrice(\%pricesmaart2022_small_battery, 'Connect', 46905-400, 58, $false, $fa
 fillPrice(\%pricesmaart2022_small_battery, 'Connect+', 49905-400, 58, $false, $false, "maart 2022 E400 korting");
 fillPrice(\%pricesmaart2022_small_battery, 'Lounge', 52305-600, 58, $false, $false, "maart 2022 E600 korting");
 
-fillPrice(\%pricesmaart2022_big_battery, 'Style', 46405-1000, 73, $false, $false, "maart 2022 E1000 korting");
+fillPrice(\%pricesmaart2022_big_battery, 'Style', 46405-900, 73, $false, $false, "maart 2022 E900 korting");
 fillPrice(\%pricesmaart2022_big_battery, 'Connect', 50505-1000, 73, $false, $false, "maart 2022 E1000 korting");
 fillPrice(\%pricesmaart2022_big_battery, 'Connect+', 53505-1000, 73, $false, $false, "maart 2022 E1000 korting");
-fillPrice(\%pricesmaart2022_big_battery, 'Lounge', 55905-1000, 73, $false, $false, "maart 2022 E1000 korting");
+fillPrice(\%pricesmaart2022_big_battery, 'Lounge', 55905-1200, 73, $false, $false, "maart 2022 E1200 korting");
         
 fillPrice(\%pricemaart2022_big_battery_AWD, 'Connect', 54505-1000, 73, $true, $false, "maart 2022 E1000 korting");
 fillPrice(\%pricemaart2022_big_battery_AWD, 'Connect+', 57505-1000, 73, $true, $false, "maart 2022 E1000 korting");
-fillPrice(\%pricemaart2022_big_battery_AWD, 'Lounge', 59905-1000, 73, $true, $false, "maart 2022 E1000 korting");
+fillPrice(\%pricemaart2022_big_battery_AWD, 'Lounge', 59905-1200, 73, $true, $false, "maart 2022 E1200 korting");
 
 $PRICELISTS{"20220301_58"} = \%pricesmaart2022_small_battery;
 $PRICELISTS{"20220301_73"} = \%pricesmaart2022_big_battery;
@@ -880,14 +885,14 @@ fillPrice(\%pricesmei2022_small_battery, 'Connect', 48405-400, 58, $false, $fals
 fillPrice(\%pricesmei2022_small_battery, 'Connect+', 51405-400, 58, $false, $false, "mei 2022 E400 korting");
 fillPrice(\%pricesmei2022_small_battery, 'Lounge', 53805-600, 58, $false, $false, "mei 2022 E600 korting");
 
-fillPrice(\%pricesmei2022_big_battery, 'Style', 47905-1000, 73, $false, $false, "mei 2022 E1000 korting");
+fillPrice(\%pricesmei2022_big_battery, 'Style', 47905-900, 73, $false, $false, "mei 2022 E900 korting");
 fillPrice(\%pricesmei2022_big_battery, 'Connect', 52005-1000, 73, $false, $false, "mei 2022 E1000 korting");
 fillPrice(\%pricesmei2022_big_battery, 'Connect+', 55005-1000, 73, $false, $false, "mei 2022 E1000 korting");
-fillPrice(\%pricesmei2022_big_battery, 'Lounge', 57405-1000, 73, $false, $false, "mei 2022 E1000 korting");
+fillPrice(\%pricesmei2022_big_battery, 'Lounge', 57405-1200, 73, $false, $false, "mei 2022 E1200 korting");
         
 fillPrice(\%pricesmei2022_big_battery_AWD, 'Connect', 56005-1000, 73, $true, $false, "mei 2022 E1000 korting");
 fillPrice(\%pricesmei2022_big_battery_AWD, 'Connect+', 59005-1000, 73, $true, $false, "mei 2022 E1000 korting");
-fillPrice(\%pricesmei2022_big_battery_AWD, 'Lounge', 61405-1000, 73, $true, $false, "mei 2022 E1000 korting");
+fillPrice(\%pricesmei2022_big_battery_AWD, 'Lounge', 61405-1200, 73, $true, $false, "mei 2022 E1200 korting");
 
 $PRICELISTS{"20220501_58"} = \%pricesmei2022_small_battery;
 $PRICELISTS{"20220501_73"} = \%pricesmei2022_big_battery;
@@ -919,14 +924,14 @@ fillPrice(\%pricessept2022_small_battery, 'Connect+', 52900-400, 58, $false, $fa
 fillPrice(\%pricessept2022_small_battery, 'Lounge', 55300-600, 58, $false, $false, "sept 2022 E600 korting");
 
 
-fillPrice(\%pricessept2022_big_battery, 'Style', 49400-1000, 73, $false, $false, "sept 2022 E1000 korting");
+fillPrice(\%pricessept2022_big_battery, 'Style', 49400-900, 73, $false, $false, "sept 2022 E900 korting");
 fillPrice(\%pricessept2022_big_battery, 'Connect', 53500-1000, 73, $false, $false, "sept 2022 E1000 korting");
 fillPrice(\%pricessept2022_big_battery, 'Connect+', 56500-1000, 73, $false, $false, "sept 2022 E1000 korting");
-fillPrice(\%pricessept2022_big_battery, 'Lounge', 58900-1000, 73, $false, $false, "sept 2022 E1000 korting");
+fillPrice(\%pricessept2022_big_battery, 'Lounge', 58900-1200, 73, $false, $false, "sept 2022 E1200 korting");
         
 fillPrice(\%pricessept2022_big_battery_AWD, 'Connect', 57500-1000, 73, $true, $false, "sept 2022 E1000 korting");
 fillPrice(\%pricessept2022_big_battery_AWD, 'Connect+', 60500-1000, 73, $true, $false, "sept 2022 E1000 korting");
-fillPrice(\%pricessept2022_big_battery_AWD, 'Lounge', 62900-1000, 73, $true, $false, "sept 2022 E1000 korting");
+fillPrice(\%pricessept2022_big_battery_AWD, 'Lounge', 62900-1200, 73, $true, $false, "sept 2022 E1200 korting");
 
 $PRICELISTS{"20220901_58"} = \%pricessept2022_small_battery;
 $PRICELISTS{"20220901_73"} = \%pricessept2022_big_battery;
@@ -1025,34 +1030,11 @@ $PRICELISTS{"20230101_58_2023"} = \%pricesjan2023_small_battery_2023;
 $PRICELISTS{"20230101_77"} = \%pricesjan2023_big_battery_2023;
 $PRICELISTS{"20230101_77AWD"} = \%pricesjan2023_big_battery_AWD_2023;
 
-# model 2023 prijslijst januari 2023: 1400 euro duurder dan september 2022
-my %pricesjan2023_small_battery_2023;
-my %pricesjan2023_big_battery_2023;
-my %pricesjan2023_big_battery_AWD_2023;
-
-fillPrice(\%pricesjan2023_small_battery_2023, 'Style', 47200, 58, $false, $true, "jan 2023");
-fillPrice(\%pricesjan2023_small_battery_2023, 'Connect', 51300, 58, $false, $true, "jan 2023");
-fillPrice(\%pricesjan2023_small_battery_2023, 'Connect+', 54300, 58, $false, $true, "jan 2023");
-fillPrice(\%pricesjan2023_small_battery_2023, 'Lounge', 56700, 58, $false, $true, "jan 2023");
-
-fillPrice(\%pricesjan2023_big_battery_2023, 'Style', 50800, 77, $false, $true, "jan 2023");
-fillPrice(\%pricesjan2023_big_battery_2023, 'Connect', 54900, 77, $false, $true, "jan 2023");
-fillPrice(\%pricesjan2023_big_battery_2023, 'Connect+', 57900, 77, $false, $true, "jan 2023");
-fillPrice(\%pricesjan2023_big_battery_2023, 'Lounge', 60300, 77, $false, $true, "jan 2023");
-        
-fillPrice(\%pricesjan2023_big_battery_AWD_2023, 'Connect', 58900, 77, $true, $true, "jan 2023");
-fillPrice(\%pricesjan2023_big_battery_AWD_2023, 'Connect+', 61900, 77, $true, $true, "jan 2023");
-fillPrice(\%pricesjan2023_big_battery_AWD_2023, 'Lounge', 64300, 77, $true, $true, "jan 2023");
-
-$PRICELISTS{"20230101_58_2023"} = \%pricesjan2023_small_battery_2023;
-$PRICELISTS{"20230101_77"} = \%pricesjan2023_big_battery_2023;
-$PRICELISTS{"20230101_77AWD"} = \%pricesjan2023_big_battery_AWD_2023;
-
 my $filename="missing.txt";
 print "Processing $filename\n";
 my @KENTEKENS;
 my %TENAAMGESTELD;
-open(FILE, "$filename") or die("Cannot open for read: $filename: $!\n");
+open(FILE, "$filename") or myDie("Cannot open for read: $filename: $!\n");
 my @LINES;
 while (<FILE>) {
     my $currentLine = $_;
@@ -1070,7 +1052,7 @@ my @errors;
 my %TYPES;
 my @specialKentekens;
 my @newMissing;
-open(OUTFILE, ">missing.outfile.txt") or die("Cannot open for write: missing.outfile.txt: $!\n");
+open(OUTFILE, ">missing.outfile.txt") or myDie("Cannot open for write: missing.outfile.txt: $!\n");
 my $start_time = time();
 foreach my $k (@KENTEKENS) {
 
@@ -1107,7 +1089,7 @@ foreach my $k (@KENTEKENS) {
     my $AfgDatKent;
     my $DatumGdk = "????????";
     my $EersteToelatingsdatum;
-    open(KENTEKENFILE, "$filename") or die("Cannot open for read: $filename: $!\n");
+    open(KENTEKENFILE, "$filename") or myDie("Cannot open for read: $filename: $!\n");
     my $OpNaam = "????????";
     while (<KENTEKENFILE>) {
         my $line = "$_";
@@ -1222,7 +1204,7 @@ foreach my $k (@KENTEKENS) {
     if (substr($date20, 0, 3) != "202") {
         print "Invalid date: $date20 $EersteToelatingsdatum, $AfgDatKent, $DatumGdk\n" if $DEBUG;
         $date20 = substr($date20, 6, 4) . substr($date20, 3,2) . substr($date20, 0,2);
-        print "Corrected date: $date20" if $DEBUG;
+        print "Corrected date: $date20\n" if $DEBUG;
     }
     print "date20=$date20      $EersteToelatingsdatum, $AfgDatKent, $DatumGdk\n" if $DEBUG;
     my $value = getVariant($type, $false, $k, $date20);
@@ -1234,7 +1216,7 @@ foreach my $k (@KENTEKENS) {
     }
     if (not $exists) {
         $filename="kentekens/x.missing.$k.html";
-        rename 'x.missing', $filename or die "Cannot rename file: $!";
+        rename 'x.missing', $filename or myDie "Cannot rename file: $!";
     }
     $type =~ s?\s*$??; # get rid of spaces at the end
     $type =~ s?;e9\*2018\/858\*11054\*0[134]; prijs: ? Euro?;
