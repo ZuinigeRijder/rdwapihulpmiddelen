@@ -1,3 +1,11 @@
+<a name="R1.2.0"></a>
+# [Small improvements and fixes (R1.2.0)](https://github.com/ZuinigeRijder/rdwapihulpmiddelen/releases/tag/R1.2.0) - 16 Mar 2023
+
+Small improvements and fixes
+
+[Changes][R1.2.0]
+
+
 <a name="R1.1.0"></a>
 # [Prijslijsten IONIQ 5 januari 2023 toegevoegd. (R1.1.0)](https://github.com/ZuinigeRijder/rdwapihulpmiddelen/releases/tag/R1.1.0) - 05 Jan 2023
 
@@ -16,6 +24,7 @@ Je kunt in ieder geval inspiratie opdoen.
 [Changes][R1.0.0]
 
 
+[R1.2.0]: https://github.com/ZuinigeRijder/rdwapihulpmiddelen/compare/R1.1.0...R1.2.0
 [R1.1.0]: https://github.com/ZuinigeRijder/rdwapihulpmiddelen/compare/R1.0.0...R1.1.0
 [R1.0.0]: https://github.com/ZuinigeRijder/rdwapihulpmiddelen/tree/R1.0.0
 
