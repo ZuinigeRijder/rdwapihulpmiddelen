@@ -1,3 +1,11 @@
+<a name="R1.3.0"></a>
+# [Gezamelijke code veplaatst naar module rdw_utils.pm (R1.3.0)](https://github.com/ZuinigeRijder/rdwapihulpmiddelen/releases/tag/R1.3.0) - 17 Mar 2023
+
+Gezamelijke code veplaatst naar module rdw_utils.pm
+
+[Changes][R1.3.0]
+
+
 <a name="R1.2.0"></a>
 # [Small improvements and fixes (R1.2.0)](https://github.com/ZuinigeRijder/rdwapihulpmiddelen/releases/tag/R1.2.0) - 16 Mar 2023
 
@@ -24,6 +32,7 @@ Je kunt in ieder geval inspiratie opdoen.
 [Changes][R1.0.0]
 
 
+[R1.3.0]: https://github.com/ZuinigeRijder/rdwapihulpmiddelen/compare/R1.2.0...R1.3.0
 [R1.2.0]: https://github.com/ZuinigeRijder/rdwapihulpmiddelen/compare/R1.1.0...R1.2.0
 [R1.1.0]: https://github.com/ZuinigeRijder/rdwapihulpmiddelen/compare/R1.0.0...R1.1.0
 [R1.0.0]: https://github.com/ZuinigeRijder/rdwapihulpmiddelen/tree/R1.0.0
