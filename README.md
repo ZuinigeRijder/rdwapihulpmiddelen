@@ -8,6 +8,10 @@
 Perl RDW API hulpmiddelen voor de IONIQ 5, misschien dat het ook gebruikt kan worden ter inspiratie voor andere auto's. Maar kan natuurlijk ook gebruikt worden om nieuwe kentekens te vinden die nog niet op naam staan.
 Voor de python versie, [zie hier](https://github.com/ZuinigeRijder/rdwapihulpmiddelen_python).
 
+> **_BELANGRIJK:_**  Aangezien per 12 april 2023 de RDW ook kentekens nog niet op naam teruggeeft, zijn deze perl scripts verouderd. Betekent ook dat de perl scripts hier niet meer werken zoals voorheen en ik graag doorverwijs naar de [Python variant](https://github.com/ZuinigeRijder/rdwapihulpmiddelen_python), die wel is aangepast.
+
+Ter lering en vermaak is de perl versie nog steeds beschikbaar.
+
 Er zijn 3 tools:
 - rdw.bat: haalt IONIQ 5 kentekens op naam op
 - rdwfinder.bat: vind kentekens in de opgegeven range (hoeven nog niet op naam te staan)
